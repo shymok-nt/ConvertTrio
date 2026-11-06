@@ -124,23 +124,31 @@ export default function HomePage() {
 
   return (
     <main className="shell">
+      <div className="utility-bar"><div className="utility-inner"><span>CONVERTTRIO TOOLS</span><span>Images made simple</span><span className="utility-accent">FREE · PRIVATE · FAST</span></div></div>
       <header className="topbar">
         <a className="brand" href="/" aria-label="ConvertTrio home"><span className="brand-mark">C<span>↗</span></span>Convert<span>Trio</span></a>
-        <span className="header-label">Simple tools. Better files.</span>
+        <nav className="main-nav" aria-label="Main navigation">
+          <a href="#converter">Image converter</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#privacy">Privacy</a>
+        </nav>
+        <a className="nav-cta" href="#converter">Start converting <span aria-hidden="true">↗</span></a>
       </header>
 
       <section className="hero">
-        <div className="eyebrow"><span className="eyebrow-dot" /> FREE ONLINE IMAGE CONVERTER</div>
-        <h1>Every format.<br /><em>One simple place.</em></h1>
-        <p className="subtitle">Convert PNG, JPG, and WebP images in seconds. No account, no uploads, no fuss.</p>
-        <div className="feature-pills"><span>✦ Private by design</span><span>✦ No sign-up</span><span>✦ Free to use</span></div>
+        <div className="eyebrow"><span className="eyebrow-dot" /> CONVERTTRIO · IMAGE TOOLS</div>
+        <h1>File conversion, <em>simplified.</em></h1>
+        <p className="subtitle">Convert your images to the format you need. Fast, free, and right in your browser.</p>
       </section>
 
-      <section className="converter" aria-label="Image converter">
-        <div className="converter-heading"><div><p className="section-kicker">YOUR WORKSPACE</p><h2>Image converter</h2></div><span className="converter-tag">PNG · JPG · WEBP</span></div>
+      <section className="converter" id="converter" aria-label="Image converter">
+        <div className="converter-heading">
+          <div><p className="section-kicker">YOUR CONVERSION SPACE</p><h2>Ready when you are.</h2><p className="panel-subtitle">Upload your images and let ConvertTrio handle the rest.</p></div>
+          <span className="converter-tag">PNG · JPG · WEBP</span>
+        </div>
         <input ref={inputRef} className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp" aria-label="Choose images" onChange={(event) => { if (event.target.files) chooseFiles(event.target.files); event.target.value = ""; }} />
         <div className={`dropzone ${dragging ? "dragging" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { event.preventDefault(); setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); chooseFiles(event.dataTransfer.files); }}>
-          <div className="empty-upload"><div className="upload-icon" aria-hidden="true">↑</div><h3>Drop your images here</h3><p>or select up to 20 images from your device</p><button type="button" disabled={working} className="browse-button" onClick={() => inputRef.current?.click()}>Browse files <span aria-hidden="true">↗</span></button><small>PNG, JPG or WebP · 20 MB per file · 40 MP maximum</small></div>
+          <div className="empty-upload"><div className="upload-icon" aria-hidden="true">⇧</div><h3>Drop files anywhere in this area</h3><p>Or choose images from your computer to get started</p><button type="button" disabled={working} className="browse-button" onClick={() => inputRef.current?.click()}>Choose files <span aria-hidden="true">↗</span></button><small>PNG, JPG or WebP · Up to 20 files · 20 MB each</small></div>
         </div>
         {files.length > 0 && <div className="batch-list"><div className="batch-heading"><strong>{files.length} image{files.length !== 1 ? "s" : ""} selected</strong><button className="text-button" disabled={working} onClick={() => { setFiles([]); clearResults(); }} type="button">Clear all</button></div>{files.map((file, index) => <div className="batch-item" key={index}><span className="batch-filename" title={file.name}>{file.name}</span><span>{formatBytes(file.size)}</span></div>)}</div>}
         <div className="converter-controls">
@@ -158,7 +166,7 @@ export default function HomePage() {
         <p className="privacy-note">🔒 Your images stay on your device. Conversion happens in your browser.</p>
       </section>
 
-      <section className="benefits" aria-label="Benefits"><div><span className="benefit-icon">◇</span><h3>Made to be easy</h3><p>No complicated settings. Just choose your image and format.</p></div><div><span className="benefit-icon">◎</span><h3>Privacy comes first</h3><p>Images are processed locally, without being sent to a server.</p></div><div><span className="benefit-icon">↗</span><h3>Ready in seconds</h3><p>Get your converted image and download it right away.</p></div></section>
+      <section className="benefits" id="how-it-works" aria-label="Benefits"><div><span className="benefit-icon">◇</span><h3>Made to be easy</h3><p>No complicated settings. Just choose your image and format.</p></div><div id="privacy"><span className="benefit-icon">◎</span><h3>Privacy comes first</h3><p>Images are processed locally, without being sent to a server.</p></div><div><span className="benefit-icon">↗</span><h3>Ready in seconds</h3><p>Get your converted image and download it right away.</p></div></section>
       <footer><span>© {new Date().getFullYear()} ConvertTrio</span><span>Made for simpler file conversions.</span></footer>
     </main>
   );
