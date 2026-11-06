@@ -612,7 +612,9 @@ export default function HomePage() {
     setNotice(invalid ? `${invalid} file(s) skipped. Supported: PNG, JPG, WebP, BMP, AVIF (20 MB max).` : unique.length > remaining ? "The queue supports up to 20 images." : duplicates ? `${duplicates} duplicate file(s) skipped.` : "");
   }
 
-  addFilesRef.current = addFiles;
+  useEffect(() => {
+    addFilesRef.current = addFiles;
+  });
 
   useEffect(() => {
     function onPaste(event: ClipboardEvent) {
