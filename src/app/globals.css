@@ -319,3 +319,55 @@ footer { max-width: 1324px; margin: 0 auto; border-top: 1px solid #e8d9d7; paddi
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Session controls: visually integrated with the existing red-and-white studio. */
+.sidebar-format {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 19px 0;
+  border-top: 1px solid #eadfdd;
+  border-bottom: 1px solid #eadfdd;
+}
+.sidebar-format label {
+  color: #867674;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .1em;
+}
+.sidebar-format select {
+  width: 100%;
+  min-height: 42px;
+  background: #ffffff;
+  color: #3b2928;
+  border: 1px solid #e4c8c5;
+  border-radius: 4px;
+  padding: 10px 12px;
+  font-weight: 700;
+  font-size: 13px;
+}
+.sidebar-format small {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #867674;
+}
+.sidebar-download {
+  margin-top: 25px;
+  border: 1px solid #c92832;
+  background: #c92832;
+  color: #ffffff;
+  padding: 12px 15px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 750;
+  text-align: center;
+  transition: opacity .2s ease;
+}
+.sidebar-download:hover {
+  opacity: .88;
+}
+.ghost-button:not(:disabled):hover,
+.remove-button:not(:disabled):hover {
+  color: #c92832;
+}
