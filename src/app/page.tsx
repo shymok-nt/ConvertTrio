@@ -20,6 +20,7 @@ export default function HomePage() {
   const [notice, setNotice] = useState("");
   const [dragging, setDragging] = useState(false);
   const [working, setWorking] = useState(false);
+  const [defaultFormat, setDefaultFormat] = useState<OutputFormat>("image/webp");
   const inputRef = useRef<HTMLInputElement>(null);
   const idRef = useRef(0);
   const queueRef = useRef<QueueItem[]>([]);
@@ -41,18 +42,28 @@ export default function HomePage() {
     const incoming = Array.from(selected);
     if (!incoming.length) return;
     const valid = incoming.filter(fileIsSupported);
+    const existingKeys = new Set(queueRef.current.map((item) => `${item.file.name}:${item.file.size}:${item.file.lastModified}`));
+    const unique = valid.filter((file) => {
+      const key = `${file.name}:${file.size}:${file.lastModified}`;
+      if (existingKeys.has(key)) return false;
+      existingKeys.add(key);
+      return true;
+    });
     const remaining = Math.max(0, 20 - queueRef.current.length);
-    const added = valid.slice(0, remaining).map((file): QueueItem => ({
-      id: ++idRef.current, file, format: "image/webp", status: "ready", progress: 0,
+    const added = unique.slice(0, remaining).map((file): QueueItem => ({
+      id: ++idRef.current, file, format: defaultFormat, status: "ready", progress: 0,
     }));
     if (added.length) updateQueue((current) => [...current, ...added]);
     const invalid = incoming.length - valid.length;
-    setNotice(invalid ? `${invalid} file(s) skipped. Supported: PNG, JPG, WebP, BMP, AVIF (20 MB max).` : valid.length > remaining ? "The queue supports up to 20 images." : "");
+    const duplicates = valid.length - unique.length;
+    setNotice(invalid ? `${invalid} file(s) skipped. Supported: PNG, JPG, WebP, BMP, AVIF (20 MB max).` : unique.length > remaining ? "The queue supports up to 20 images." : duplicates ? `${duplicates} duplicate file(s) skipped.` : "");
   }
 
   useEffect(() => {
     function onPaste(event: ClipboardEvent) {
       if (busyRef.current || !event.clipboardData) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName))) return;
       const files = Array.from(event.clipboardData.files);
       if (files.length) {
         event.preventDefault();
@@ -104,7 +115,7 @@ export default function HomePage() {
         try {
           const blob = await transformImage(item.file, item.format);
           const extension = formats.find((format) => format.value === item.format)!.extension;
-          const base = item.file.name.replace(/\.[^.]+$/, "") || "converted";
+          const base = item.file.name.replace(/\.[^.]+$/, "").replace(/[\\/<>:"|?*\x00-\x1f]/g, "_").slice(0, 120).trim() || "converted";
           let name = `${base}.${extension}`;
           let suffix = 2;
           while (usedNames.has(name.toLowerCase())) name = `${base}-${suffix++}.${extension}`;
@@ -127,6 +138,29 @@ export default function HomePage() {
   const totalBytes = queue.reduce((sum, item) => sum + item.file.size, 0);
   const errors = queue.filter((item) => item.status === "error").length;
   const conversionProgress = queue.length ? Math.round((finished / queue.length) * 100) : 0;
+  const readyForDownload = queue.filter((item) => item.status === "done" && item.output);
+
+  function applyFormatToPending(format: OutputFormat) {
+    if (busyRef.current) return;
+    setDefaultFormat(format);
+    updateQueue((current) => current.map((item) => {
+      if (item.status === "done" || item.status === "converting") return item;
+      return { ...item, format, status: "ready", error: undefined, progress: 0 };
+    }));
+  }
+
+  function downloadCompleted() {
+    // A single ZIP is intentionally not generated: browser-only downloads require
+    // user gestures and multiple automatic downloads may be blocked by browsers.
+    // Offer the per-file links as the reliable default instead.
+    const first = readyForDownload[0]?.output;
+    if (!first) return;
+    const link = document.createElement("a");
+    link.href = first.url;
+    link.download = first.name;
+    link.click();
+    if (readyForDownload.length > 1) setNotice("Downloaded the first image. Use each Download button for the remaining files.");
+  }
 
   return (
     <main className="shell">
@@ -204,17 +238,20 @@ export default function HomePage() {
               <span className="section-overline">02 / SESSION</span>
               <h2>Everything<br />in one place.</h2>
               <p>Your files stay right here, in your browser. No accounts, no uploads, no detours.</p>
+              <div className="sidebar-format"><label htmlFor="default-format">DEFAULT OUTPUT</label><select id="default-format" disabled={working} value={defaultFormat} onChange={(event) => applyFormatToPending(event.target.value as OutputFormat)}>{formats.map((format) => <option key={format.value} value={format.value}>{format.label}</option>)}</select><small>Applies to new files and files not yet converted.</small></div>
             </div>
             <div className="session-metrics" aria-live="polite">
               <div className="metric"><span>FILES IN QUEUE</span><strong>{String(queue.length).padStart(2, "0")}</strong></div>
               <div className="metric"><span>ORIGINAL SIZE</span><strong>{queue.length ? formatBytes(totalBytes) : "—"}</strong></div>
               <div className="metric"><span>COMPLETED</span><strong>{String(finished).padStart(2, "0")}</strong></div>
+              {readyForDownload.length > 0 && <div className="metric"><span>READY TO SAVE</span><strong>{String(readyForDownload.length).padStart(2, "0")}</strong></div>}
               {errors > 0 && <div className="metric metric-error"><span>NEEDS ATTENTION</span><strong>{String(errors).padStart(2, "0")}</strong></div>}
             </div>
             <div className="sidebar-progress">
               <div className="sidebar-progress-label"><span>SESSION PROGRESS</span><strong>{conversionProgress}%</strong></div>
               <div className="sidebar-progress-track" role="progressbar" aria-label="Completed files" aria-valuenow={conversionProgress} aria-valuemin={0} aria-valuemax={100}><div style={{ width: `${conversionProgress}%` }} /></div>
             </div>
+            {readyForDownload.length === 1 && <button type="button" className="sidebar-download" onClick={downloadCompleted}>Download converted image ↓</button>}
             <div className="sidebar-note"><span className="online-dot" /> LOCAL PROCESSING <p>Nothing leaves this device. All conversion happens in your browser.</p></div>
           </aside>
         </div>
