@@ -59,3 +59,50 @@ body{background:#fff}
 .benefits h3{font-size:16px}
 footer{max-width:1090px;margin:auto}
 @media(max-width:760px){.utility-inner{width:calc(100% - 32px);gap:12px}.utility-inner span:nth-child(2){display:none}.topbar{width:calc(100% - 32px);min-height:70px;flex-wrap:wrap;gap:10px}.main-nav{order:3;width:100%;margin:0;gap:22px;padding:7px 0 12px;overflow:auto}.nav-cta{font-size:11px;padding:10px}.hero{padding:48px 18px 30px}.hero h1{letter-spacing:-1.8px}.converter{width:calc(100% - 24px);border-radius:13px}.converter-heading{padding:23px 20px;gap:12px;align-items:center}.converter-heading h2{font-size:20px}.panel-subtitle{font-size:12px;line-height:1.5}.converter-tag{font-size:9px}.dropzone{min-height:270px;padding:30px 15px}.converter-controls{padding:20px}.quality-control{padding:10px 20px 20px}.converter>.batch-list,.converter>.message,.converter>.progress-track{margin-left:16px;margin-right:16px}.benefits{width:calc(100% - 40px);margin:45px auto;gap:26px}footer{width:calc(100% - 40px)}}
+
+/* Minimal interface refresh */
+:root{background:#fff;color:#202124}
+.utility-bar{display:none}
+.topbar{width:min(1040px,calc(100% - 48px));min-height:76px;padding:19px 0}
+.brand{font-size:21px;letter-spacing:-.7px;gap:8px}
+.brand-mark{background:#5265d8;border-radius:9px;width:31px;height:31px;font-size:18px}
+.main-nav{margin-left:55px;gap:30px}
+.main-nav a{font-size:13px;color:#616672;font-weight:500}
+.nav-cta{font-size:12px;color:#354fc8;border-color:#e0e4f1;border-radius:7px;padding:9px 15px}
+.hero{border-top:1px solid #f0f1f4;padding:74px 20px 38px}
+.eyebrow{display:none}
+.hero h1{font-size:clamp(36px,4.2vw,54px);font-weight:700;letter-spacing:-2.2px;line-height:1.15;margin:0 0 14px;color:#242832}
+.hero h1 em{color:inherit}
+.hero .subtitle{font-size:16px;line-height:1.6;color:#737987}
+.converter{max-width:960px;background:#fff;color:#222832;border:1px solid #e6e8ed;border-radius:12px;box-shadow:0 8px 30px #1e293b0a;overflow:hidden}
+.converter-heading{min-height:0;background:#fff;padding:25px 30px 19px;border-bottom:1px solid #eceef2}
+.converter-heading .section-kicker{display:none}
+.converter-heading h2{font-size:19px;color:#242832;letter-spacing:-.3px}
+.panel-subtitle{font-size:13px;color:#858b98;margin-top:6px}
+.converter-tag{font-size:11px;background:#f5f6f9;border:1px solid #e9ebf0;color:#707787;padding:9px 12px;border-radius:6px}
+.dropzone{background:#fafbfc;min-height:265px;margin:24px 30px 0;border:1.5px dashed #d6dae4;border-radius:9px;padding:30px 20px;color:#272b34}
+.dropzone.dragging{background:#f0f3ff;outline:none;border-color:#5265d8}
+.upload-icon{width:42px;height:42px;background:#f0f2f8;border:1px solid #e4e8f0;color:#5265d8;border-radius:10px;font-size:25px;margin-bottom:16px}
+.empty-upload h3{font-size:17px;font-weight:650;letter-spacing:-.2px}
+.empty-upload p{font-size:13px;color:#858b98;margin:7px 0 20px}
+.browse-button{background:#5265d8;border-radius:7px;padding:12px 24px;box-shadow:none;font-size:13px}
+.browse-button:hover{background:#4255c3}
+.empty-upload small{color:#9299a6;font-size:11px}
+.converter-controls{background:#fff;border:0;padding:24px 30px 22px}
+.converter-controls label{color:#5c6473}
+.converter-controls select{background:#fff;color:#293142;border:1px solid #d9dde6;border-radius:7px}
+.convert-button{background:#5265d8;border-radius:7px}
+.privacy-note{background:#fafbfc;border-top:1px solid #eef0f3;color:#8a919d;padding:15px 20px;font-size:12px}
+.converter>.batch-list{background:#fff;border-color:#e5e8ee}
+.batch-heading{background:#f7f8fa}
+.batch-heading,.batch-item{color:#2b3342;border-color:#e9ebf0}
+.batch-item>span:nth-child(2){color:#858b98}
+.text-button{color:#5265d8}
+.converter>.message.success{background:#f0f9f3;border-color:#d4eadd;color:#245b39}
+.converter>.message.error{background:#fff1f1;border-color:#ffd4d8;color:#b42333}
+.benefits{max-width:960px;margin:54px auto 65px;gap:40px}
+.benefit-icon{background:#f1f3fa;color:#5265d8}
+.benefits h3{font-size:14px}
+.benefits p{font-size:13px}
+footer{max-width:960px}
+@media(max-width:760px){.topbar{width:calc(100% - 32px)}.main-nav{margin:0;gap:18px}.hero{padding:58px 18px 32px}.hero h1{letter-spacing:-1.5px}.converter{width:calc(100% - 24px)}.converter-heading{padding:22px 19px 16px}.dropzone{margin:16px 16px 0;padding:25px 14px;min-height:240px}.converter-controls{padding:20px 16px}.benefits{width:calc(100% - 40px)}}
