@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { transformImage, type ImageOptions } from "@/lib/image-transform";
 
 type OutputFormat = "image/png" | "image/jpeg" | "image/webp";
 type Result = { url: string; name: string; size: number; blob: Blob };
@@ -10,13 +11,16 @@ const formats: { value: OutputFormat; label: string; extension: string }[] = [
   { value: "image/webp", label: "WebP", extension: "webp" },
 ];
 const MAX_BYTES = 20 * 1024 * 1024;
-const MAX_PIXELS = 40_000_000;
 const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
 const formatBytes = (bytes: number) => bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
 export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
+  const [maxDimension, setMaxDimension] = useState(0);
+  const [rotation, setRotation] = useState<ImageOptions["rotation"]>(0);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+  const [flipVertical, setFlipVertical] = useState(false);
   const [format, setFormat] = useState<OutputFormat>("image/webp");
   const [results, setResults] = useState<Result[]>([]);
   const [error, setError] = useState("");
@@ -57,38 +61,14 @@ export default function HomePage() {
     try {
       for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        const source = URL.createObjectURL(file);
-        try {
-          const image = new Image();
-          image.src = source;
-          await image.decode();
-          if (!image.naturalWidth || !image.naturalHeight || image.naturalWidth * image.naturalHeight > MAX_PIXELS) {
-            throw new Error(`Cannot convert ${file.name}: maximum image size is 40 megapixels.`);
-          }
-          const canvas = document.createElement("canvas");
-          canvas.width = image.naturalWidth;
-          canvas.height = image.naturalHeight;
-          const context = canvas.getContext("2d");
-          if (!context) throw new Error("Your browser cannot process this image.");
-          if (format === "image/jpeg") {
-            context.fillStyle = "#ffffff";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-          }
-          context.drawImage(image, 0, 0);
-          const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, format, 1));
-          canvas.width = 0;
-          canvas.height = 0;
-          if (!blob || blob.type !== format) throw new Error("Your browser does not support this output format.");
-          const extension = formats.find((item) => item.value === format)!.extension;
-          const base = file.name.replace(/\\.[^.]+$/, "") || "converted";
-          let name = `${base}.${extension}`;
-          let suffix = 2;
-          while (usedNames.has(name.toLowerCase())) name = `${base}-${suffix++}.${extension}`;
-          usedNames.add(name.toLowerCase());
-          output.push({ url: URL.createObjectURL(blob), name, size: blob.size, blob });
-        } finally {
-          URL.revokeObjectURL(source);
-        }
+        const blob = await transformImage(file, { format, maxDimension, rotation, flipHorizontal, flipVertical });
+        const extension = formats.find((item) => item.value === format)!.extension;
+        const base = file.name.replace(/\\.[^.]+$/, "") || "converted";
+        let name = `${base}.${extension}`;
+        let suffix = 2;
+        while (usedNames.has(name.toLowerCase())) name = `${base}-${suffix++}.${extension}`;
+        usedNames.add(name.toLowerCase());
+        output.push({ url: URL.createObjectURL(blob), name, size: blob.size, blob });
         setProgress(Math.round(((index + 1) / files.length) * 100));
       }
       resultsRef.current = output;
@@ -139,6 +119,25 @@ export default function HomePage() {
             {formats.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
           </select>
           <button className="convert-button" type="button" disabled={!files.length || working} onClick={convert}>{working ? `Converting… ${progress}%` : `Convert ${files.length > 1 ? "images" : "image"}`} <span aria-hidden="true">→</span></button>
+        </div>
+        <div className="image-options" aria-label="Image adjustments">
+          <label htmlFor="image-size">Max image size</label>
+          <select id="image-size" value={maxDimension} disabled={working} onChange={(event) => { setMaxDimension(Number(event.target.value)); clearResults(); }}>
+            <option value={0}>Original dimensions</option>
+            <option value={3840}>3840 px (4K)</option>
+            <option value={1920}>1920 px (Full HD)</option>
+            <option value={1280}>1280 px</option>
+            <option value={800}>800 px</option>
+          </select>
+          <label htmlFor="image-rotation">Rotate</label>
+          <select id="image-rotation" value={rotation} disabled={working} onChange={(event) => { setRotation(Number(event.target.value) as ImageOptions["rotation"]); clearResults(); }}>
+            <option value={0}>None</option>
+            <option value={90}>90° clockwise</option>
+            <option value={180}>180°</option>
+            <option value={270}>90° counterclockwise</option>
+          </select>
+          <label className="flip-option"><input type="checkbox" checked={flipHorizontal} disabled={working} onChange={(event) => { setFlipHorizontal(event.target.checked); clearResults(); }} /> Flip horizontally</label>
+          <label className="flip-option"><input type="checkbox" checked={flipVertical} disabled={working} onChange={(event) => { setFlipVertical(event.target.checked); clearResults(); }} /> Flip vertically</label>
         </div>
         {working && <div className="progress-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Conversion progress"><div style={{ width: `${progress}%` }} /></div>}
         {error && <p className="message error" role="alert">{error}</p>}
