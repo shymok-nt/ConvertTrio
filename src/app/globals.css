@@ -106,3 +106,11 @@ footer{max-width:1090px;margin:auto}
 .benefits p{font-size:13px}
 footer{max-width:960px}
 @media(max-width:760px){.topbar{width:calc(100% - 32px)}.main-nav{margin:0;gap:18px}.hero{padding:58px 18px 32px}.hero h1{letter-spacing:-1.5px}.converter{width:calc(100% - 24px)}.converter-heading{padding:22px 19px 16px}.dropzone{margin:16px 16px 0;padding:25px 14px;min-height:240px}.converter-controls{padding:20px 16px}.benefits{width:calc(100% - 40px)}}
+
+/* Compact image options; existing layout intentionally unchanged. */
+.image-options{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;padding:0 30px 22px;font-size:12px;color:#626a79}
+.image-options>label:not(.flip-option){font-weight:600}
+.image-options select{padding:9px 10px;border:1px solid #d9dde6;border-radius:7px;background:#fff;color:#293142;max-width:100%}
+.flip-option{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;cursor:pointer}
+.flip-option input{accent-color:#5265d8}
+@media(max-width:760px){.image-options{padding:0 16px 20px;gap:10px}.image-options>label:not(.flip-option){width:100%}.image-options select{flex:1;min-width:0}}
