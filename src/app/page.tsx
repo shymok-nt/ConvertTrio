@@ -13,7 +13,7 @@ const formats: { value: OutputFormat; label: string; extension: string }[] = [
 const MAX_BYTES = 20 * 1024 * 1024;
 const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp", "image/bmp", "image/x-ms-bmp", "image/avif"]);
 const formatBytes = (bytes: number) => bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(2)} MB`;
-const fileIsSupported = (file: File) => (allowedTypes.has(file.type) || /\\.(bmp|avif)$/i.test(file.name)) && file.size > 0 && file.size <= MAX_BYTES;
+const fileIsSupported = (file: File) => (allowedTypes.has(file.type) || /\.(bmp|avif)$/i.test(file.name)) && file.size > 0 && file.size <= MAX_BYTES;
 
 export default function HomePage() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
@@ -104,7 +104,7 @@ export default function HomePage() {
         try {
           const blob = await transformImage(item.file, item.format);
           const extension = formats.find((format) => format.value === item.format)!.extension;
-          const base = item.file.name.replace(/\\.[^.]+$/, "") || "converted";
+          const base = item.file.name.replace(/\.[^.]+$/, "") || "converted";
           let name = `${base}.${extension}`;
           let suffix = 2;
           while (usedNames.has(name.toLowerCase())) name = `${base}-${suffix++}.${extension}`;
