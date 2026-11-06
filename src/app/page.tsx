@@ -823,6 +823,83 @@ export default function HomePage() {
         </div>
       </div>
       <section className="about" id="about"><div><span className="about-kicker">HOW IT WORKS</span><h2>Just your files.<br />Nothing else.</h2></div><p>Select images, choose PNG, JPG or WebP for each file, and download the results. Conversion runs in your browser using local image processing. BMP and AVIF input depends on your browser&apos;s decoding support.</p></section>
+      <section className="format-comparison" aria-labelledby="comparison-title">
+        <div className="comparison-intro">
+          <span className="about-kicker">AT A GLANCE</span>
+          <h2 id="comparison-title">PNG, JPEG, or WebP?</h2>
+          <p>
+            Every format has strengths. Compare their typical characteristics
+            before choosing a format for your next conversion.
+          </p>
+        </div>
+        <div className="comparison-scroll" role="region" aria-label="Image format comparison" tabIndex={0}>
+          <table className="comparison-table">
+            <thead>
+              <tr>
+                <th scope="col">Capability</th>
+                <th scope="col">PNG</th>
+                <th scope="col">JPEG</th>
+                <th scope="col">WebP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Transparency</th>
+                <td>Supported</td>
+                <td>Not supported</td>
+                <td>Supported</td>
+              </tr>
+              <tr>
+                <th scope="row">Typical use</th>
+                <td>Graphics</td>
+                <td>Photographs</td>
+                <td>Web imagery</td>
+              </tr>
+              <tr>
+                <th scope="row">Compression</th>
+                <td>Lossless</td>
+                <td>Lossy</td>
+                <td>Lossy or lossless</td>
+              </tr>
+              <tr>
+                <th scope="row">Sharp text</th>
+                <td>Often excellent</td>
+                <td>May show artifacts</td>
+                <td>Depends on encoding</td>
+              </tr>
+              <tr>
+                <th scope="row">Browser export</th>
+                <td>Widely supported</td>
+                <td>Widely supported</td>
+                <td>Modern browsers</td>
+              </tr>
+              <tr>
+                <th scope="row">Metadata retention</th>
+                <td>Not guaranteed</td>
+                <td>Not guaranteed</td>
+                <td>Not guaranteed</td>
+              </tr>
+              <tr>
+                <th scope="row">Image dimensions</th>
+                <td>Original dimensions</td>
+                <td>Original dimensions</td>
+                <td>Original dimensions</td>
+              </tr>
+              <tr>
+                <th scope="row">Output extension</th>
+                <td>.png</td>
+                <td>.jpg</td>
+                <td>.webp</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="comparison-footnote">
+          These are general format characteristics. File size and visual
+          quality depend on the original image and your browser&apos;s encoder.
+          This tool does not resize, crop, or rotate images.
+        </p>
+      </section>
       <section className="recipe-center" id="format-guide" aria-labelledby="recipe-title">
         <div className="recipe-heading">
           <div>
