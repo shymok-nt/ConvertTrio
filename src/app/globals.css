@@ -1051,3 +1051,229 @@ footer {
     color: black;
   }
 }
+
+/* Searchable queue tools */
+.queue-tools {
+  display: grid;
+  grid-template-columns: auto minmax(100px, 1fr) auto minmax(105px, 130px);
+  align-items: center;
+  gap: 9px;
+  padding: 12px 16px;
+  background: #fff8f7;
+  border-bottom: 1px solid #eddfdd;
+}
+.queue-tools label {
+  font-size: 10px;
+  color: #826b69;
+  font-weight: 750;
+}
+.queue-tools input,
+.queue-tools select {
+  min-width: 0;
+  width: 100%;
+  min-height: 35px;
+  border: 1px solid #e4c8c5;
+  background: white;
+  color: #332525;
+  border-radius: 4px;
+  padding: 7px 9px;
+  font-size: 12px;
+}
+.queue-tools input:focus-visible,
+.queue-tools select:focus-visible {
+  outline: 2px solid #c92832;
+  outline-offset: 2px;
+}
+.queue-empty {
+  padding: 25px 16px;
+  margin: 0;
+  font-size: 12px;
+  color: #857573;
+  text-align: center;
+}
+/* Help and documentation */
+.help-center {
+  max-width: 1324px;
+  padding: 45px 48px 85px;
+  margin: 0 auto;
+  border-top: 1px solid #e8d9d7;
+}
+.help-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 29px;
+}
+.help-header h2 {
+  font-size: clamp(26px, 3.5vw, 39px);
+  line-height: 1.1;
+  letter-spacing: -.055em;
+  margin: 14px 0 11px;
+}
+.help-header p {
+  font-size: 13px;
+  color: #817371;
+  line-height: 1.7;
+  margin: 0;
+}
+.help-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 230px;
+}
+.help-search span {
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .1em;
+  color: #867674;
+}
+.help-search input {
+  background: white;
+  color: #251c1c;
+  border: 1px solid #e4c8c5;
+  border-radius: 4px;
+  padding: 12px;
+  font-size: 13px;
+  width: 100%;
+}
+.help-list {
+  border: 1px solid #eadfdd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.help-entry {
+  background: #ffffff;
+  border-bottom: 1px solid #eadfdd;
+}
+.help-entry:last-child {
+  border-bottom: 0;
+}
+.help-entry[open] {
+  background: #fffaf9;
+}
+.help-entry summary {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 16px;
+  padding: 19px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.help-entry summary::-webkit-details-marker {
+  display: none;
+}
+.help-entry summary:hover {
+  background: #fff5f4;
+}
+.help-entry summary:focus-visible {
+  outline: 2px solid #c92832;
+  outline-offset: -3px;
+}
+.help-category {
+  font-size: 10px;
+  letter-spacing: .04em;
+  font-weight: 750;
+  color: #aa363e;
+}
+.help-question {
+  font-size: 13px;
+  font-weight: 700;
+  color: #342525;
+  line-height: 1.5;
+}
+.help-expand {
+  color: #b42c35;
+  font-size: 21px;
+  text-align: center;
+  transition: transform .2s ease;
+}
+.help-entry[open] .help-expand {
+  transform: rotate(45deg);
+}
+.help-entry > p {
+  color: #796967;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0;
+  padding: 0 56px 22px 154px;
+}
+.help-more {
+  display: block;
+  margin: 22px auto 0;
+  border: 1px solid #e1b4b2;
+  background: white;
+  color: #aa2932;
+  padding: 12px 19px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 750;
+}
+.help-more:hover {
+  background: #fff2f0;
+}
+.help-empty {
+  padding: 28px 20px;
+  font-size: 13px;
+  color: #817371;
+  text-align: center;
+}
+@media (max-width: 760px) {
+  .help-center {
+    padding: 30px 19px 55px;
+  }
+  .help-header {
+    display: block;
+  }
+  .help-search {
+    margin-top: 22px;
+    min-width: 0;
+  }
+  .help-entry summary {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    gap: 5px 12px;
+    padding: 15px;
+  }
+  .help-category {
+    grid-column: 1;
+  }
+  .help-question {
+    grid-column: 1;
+  }
+  .help-expand {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .help-entry > p {
+    padding: 0 45px 19px 15px;
+  }
+  .queue-tools {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 9px;
+  }
+  .queue-tools label {
+    grid-row: 1;
+  }
+  .queue-tools input,
+  .queue-tools select {
+    grid-row: 2;
+  }
+}
+@media (max-width: 390px) {
+  .queue-tools {
+    grid-template-columns: 1fr;
+  }
+  .queue-tools label,
+  .queue-tools input,
+  .queue-tools select {
+    grid-row: auto;
+  }
+  .help-entry summary {
+    padding: 13px;
+  }
+  .help-entry > p {
+    padding: 0 13px 18px;
+  }
+}
