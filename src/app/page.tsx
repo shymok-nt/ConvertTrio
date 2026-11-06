@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { transformImage, type OutputFormat } from "@/lib/image-transform";
 
 type QueueStatus = "ready" | "converting" | "done" | "error";
@@ -26,6 +27,7 @@ export default function HomePage() {
   const queueRef = useRef<QueueItem[]>([]);
   const busyRef = useRef(false);
   const dragDepthRef = useRef(0);
+  const addFilesRef = useRef<(selected: FileList | File[]) => void>(() => {});
 
   function updateQueue(next: QueueItem[] | ((current: QueueItem[]) => QueueItem[])) {
     const value = typeof next === "function" ? next(queueRef.current) : next;
@@ -59,6 +61,8 @@ export default function HomePage() {
     setNotice(invalid ? `${invalid} file(s) skipped. Supported: PNG, JPG, WebP, BMP, AVIF (20 MB max).` : unique.length > remaining ? "The queue supports up to 20 images." : duplicates ? `${duplicates} duplicate file(s) skipped.` : "");
   }
 
+  addFilesRef.current = addFiles;
+
   useEffect(() => {
     function onPaste(event: ClipboardEvent) {
       if (busyRef.current || !event.clipboardData) return;
@@ -67,7 +71,7 @@ export default function HomePage() {
       const files = Array.from(event.clipboardData.files);
       if (files.length) {
         event.preventDefault();
-        addFiles(files);
+        addFilesRef.current(files);
       }
     }
     window.addEventListener("paste", onPaste);
@@ -165,7 +169,7 @@ export default function HomePage() {
   return (
     <main className="shell">
       <header className="topbar">
-        <a className="brand" href="/" aria-label="ConvertTrio home"><span className="brand-symbol" aria-hidden="true">↗</span> ConvertTrio</a>
+        <Link className="brand" href="/" aria-label="ConvertTrio home"><span className="brand-symbol" aria-hidden="true">↗</span> ConvertTrio</Link>
         <div className="header-right"><span className="header-status"><span className="online-dot" /> Browser-based conversion</span><a href="#about" className="header-link">How it works</a></div>
       </header>
       <div className="workspace" id="converter">
