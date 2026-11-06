@@ -325,6 +325,242 @@ const helpEntries: HelpEntry[] = [
   },
 ];
 
+type ConversionRecipe = {
+  title: string;
+  formatLabel: string;
+  output: OutputFormat;
+  category: string;
+  description: string;
+  caveat: string;
+};
+
+const conversionRecipes: ConversionRecipe[] = [
+  {
+    title: "Photos for websites",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Photographs",
+    description: "Use JPEG when transparency is not needed and broad compatibility matters.",
+    caveat: "Lossy encoding may soften tiny text or sharp edges.",
+  },
+  {
+    title: "Transparent logos",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Brand assets",
+    description: "Choose PNG for crisp logos and transparent backgrounds.",
+    caveat: "Output size may be larger than WebP.",
+  },
+  {
+    title: "Web graphics",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Websites",
+    description: "Use WebP for modern web imagery with transparency support.",
+    caveat: "Check support in older software before sharing.",
+  },
+  {
+    title: "Product photos",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "E-commerce",
+    description: "Create WebP product images for a modern website workflow.",
+    caveat: "Inspect text and small product details after conversion.",
+  },
+  {
+    title: "Screenshots",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Documentation",
+    description: "PNG is well suited to interface screenshots and small typography.",
+    caveat: "Photographic screenshots may become large.",
+  },
+  {
+    title: "Social profile image",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Social",
+    description: "JPEG is widely accepted for photographic profile pictures.",
+    caveat: "A destination platform may recompress uploads.",
+  },
+  {
+    title: "Presentation graphics",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Presentations",
+    description: "PNG keeps diagrams and graphic edges clear.",
+    caveat: "Large transparent images can increase presentation size.",
+  },
+  {
+    title: "Email newsletter image",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Email",
+    description: "JPEG is a practical choice for photographic email imagery.",
+    caveat: "Some email services impose separate upload limits.",
+  },
+  {
+    title: "Blog header",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Publishing",
+    description: "WebP can provide a compact blog banner on supported sites.",
+    caveat: "Check the blog platform's accepted formats.",
+  },
+  {
+    title: "Archival working copy",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Editing",
+    description: "PNG avoids JPEG-style lossy recompression for later editing.",
+    caveat: "Converting an already compressed source cannot restore detail.",
+  },
+  {
+    title: "Simple icons",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "UI",
+    description: "PNG can preserve sharp icon silhouettes and transparency.",
+    caveat: "For scalable icons, an original vector file is preferable.",
+  },
+  {
+    title: "Photography portfolio",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Portfolio",
+    description: "JPEG is a familiar format for sharing photo previews.",
+    caveat: "Retain your original files separately.",
+  },
+  {
+    title: "Landing page illustration",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Design",
+    description: "WebP is a modern choice for illustrated landing pages.",
+    caveat: "Always inspect transparency and edges.",
+  },
+  {
+    title: "Support ticket screenshot",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Support",
+    description: "PNG keeps application labels and text legible.",
+    caveat: "Remove sensitive information before sharing.",
+  },
+  {
+    title: "Chat attachment",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Messaging",
+    description: "JPEG is compatible with many messaging apps for photos.",
+    caveat: "Messaging services may alter the image again.",
+  },
+  {
+    title: "Transparent sticker",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Messaging",
+    description: "WebP supports transparency and can work well for sticker-like assets.",
+    caveat: "The receiving application may require special sticker dimensions.",
+  },
+  {
+    title: "Image for a report",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Documents",
+    description: "PNG is useful for charts, screenshots, and line art in reports.",
+    caveat: "Document editors may resize or recompress the image.",
+  },
+  {
+    title: "Event photo",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Events",
+    description: "JPEG is a convenient output for event photography.",
+    caveat: "Keep the source image if you need future editing.",
+  },
+  {
+    title: "Portfolio thumbnail",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Portfolio",
+    description: "WebP can work well for thumbnail grids on modern sites.",
+    caveat: "This converter does not resize thumbnails.",
+  },
+  {
+    title: "Printable diagram",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Print",
+    description: "PNG is a sensible raster format for line diagrams.",
+    caveat: "Print quality still depends on the source resolution.",
+  },
+  {
+    title: "Class project image",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Education",
+    description: "PNG is useful when a class project includes text or graphics.",
+    caveat: "Your learning platform may have its own size limits.",
+  },
+  {
+    title: "Website hero photo",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Websites",
+    description: "WebP can reduce image transfer sizes compared with some alternatives.",
+    caveat: "Actual output size depends on source content and encoding.",
+  },
+  {
+    title: "Online listing image",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Marketplaces",
+    description: "JPEG is commonly supported for listing photos.",
+    caveat: "Check marketplace-specific dimensions and format requirements.",
+  },
+  {
+    title: "Transparent overlay",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Video",
+    description: "PNG preserves alpha transparency for overlays in editing software.",
+    caveat: "Video editors differ in how they handle alpha channels.",
+  },
+  {
+    title: "Digital poster",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Graphics",
+    description: "PNG helps preserve crisp lettering in a raster poster.",
+    caveat: "For large prints, source resolution is crucial.",
+  },
+  {
+    title: "App preview screenshot",
+    formatLabel: "PNG",
+    output: "image/png",
+    category: "Apps",
+    description: "PNG works well for crisp mobile app screenshots.",
+    caveat: "App stores may have strict dimension requirements.",
+  },
+  {
+    title: "Documentation diagram",
+    formatLabel: "WebP",
+    output: "image/webp",
+    category: "Documentation",
+    description: "WebP is a modern option for diagrams on web documentation.",
+    caveat: "PNG may look better for some fine line art.",
+  },
+  {
+    title: "Photo sharing",
+    formatLabel: "JPEG",
+    output: "image/jpeg",
+    category: "Personal",
+    description: "JPEG is a straightforward choice for sharing photographs.",
+    caveat: "The converter does not preserve all original metadata.",
+  },
+];
+
 export default function HomePage() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [notice, setNotice] = useState("");
@@ -332,6 +568,8 @@ export default function HomePage() {
   const [queueFilter, setQueueFilter] = useState<"all" | QueueStatus>("all");
   const [showAllHelp, setShowAllHelp] = useState(false);
   const [helpSearch, setHelpSearch] = useState("");
+  const [showAllRecipes, setShowAllRecipes] = useState(false);
+  const [recipeFilter, setRecipeFilter] = useState<OutputFormat | "all">("all");
   const [dragging, setDragging] = useState(false);
   const [working, setWorking] = useState(false);
   const [defaultFormat, setDefaultFormat] = useState<OutputFormat>("image/webp");
@@ -463,6 +701,8 @@ export default function HomePage() {
   });
   const matchingHelp = helpEntries.filter((entry) => `${entry.question} ${entry.answer} ${entry.category}`.toLowerCase().includes(helpSearch.trim().toLowerCase()));
   const visibleHelp = showAllHelp || helpSearch.trim() ? matchingHelp : matchingHelp.slice(0, 8);
+  const matchingRecipes = conversionRecipes.filter((recipe) => recipeFilter === "all" || recipe.output === recipeFilter);
+  const visibleRecipes = showAllRecipes ? matchingRecipes : matchingRecipes.slice(0, 6);
 
   function applyFormatToPending(format: OutputFormat) {
     if (busyRef.current) return;
@@ -583,6 +823,71 @@ export default function HomePage() {
         </div>
       </div>
       <section className="about" id="about"><div><span className="about-kicker">HOW IT WORKS</span><h2>Just your files.<br />Nothing else.</h2></div><p>Select images, choose PNG, JPG or WebP for each file, and download the results. Conversion runs in your browser using local image processing. BMP and AVIF input depends on your browser&apos;s decoding support.</p></section>
+      <section className="recipe-center" id="format-guide" aria-labelledby="recipe-title">
+        <div className="recipe-heading">
+          <div>
+            <span className="about-kicker">FORMAT PLAYBOOK</span>
+            <h2 id="recipe-title">Choose the right output.</h2>
+            <p>Practical presets for everyday image workflows. Each suggestion is a starting point, not a guarantee of smaller files.</p>
+          </div>
+          <div className="recipe-controls">
+            <label htmlFor="recipe-filter">Filter by output</label>
+            <select
+              id="recipe-filter"
+              value={recipeFilter}
+              onChange={(event) => {
+                setRecipeFilter(event.target.value as typeof recipeFilter);
+                setShowAllRecipes(false);
+              }}
+            >
+              <option value="all">All formats</option>
+              {formats.map((format) => (
+                <option key={format.value} value={format.value}>
+                  {format.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="recipe-grid">
+          {visibleRecipes.map((recipe) => (
+            <article className="recipe-card" key={recipe.title}>
+              <div className="recipe-card-top">
+                <span className="recipe-category">{recipe.category}</span>
+                <span className="recipe-format">{recipe.formatLabel}</span>
+              </div>
+              <h3>{recipe.title}</h3>
+              <p>{recipe.description}</p>
+              <div className="recipe-caveat">
+                <strong>Keep in mind</strong>
+                <span>{recipe.caveat}</span>
+              </div>
+              <button
+                type="button"
+                className="recipe-action"
+                disabled={working}
+                onClick={() => {
+                  applyFormatToPending(recipe.output);
+                  setNotice(`Default output set to ${recipe.formatLabel}. Existing completed files were not changed.`);
+                }}
+              >
+                Use {recipe.formatLabel} for pending files
+                <span aria-hidden="true">→</span>
+              </button>
+            </article>
+          ))}
+        </div>
+        {matchingRecipes.length > 6 && (
+          <button
+            type="button"
+            className="help-more"
+            aria-expanded={showAllRecipes}
+            onClick={() => setShowAllRecipes((value) => !value)}
+          >
+            {showAllRecipes ? "Show fewer suggestions" : `View all ${matchingRecipes.length} suggestions`}
+          </button>
+        )}
+      </section>
       <section className="help-center" id="help-center" aria-labelledby="help-title">
         <div className="help-header">
           <div>
