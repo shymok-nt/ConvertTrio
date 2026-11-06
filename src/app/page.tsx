@@ -115,7 +115,7 @@ export default function HomePage() {
         try {
           const blob = await transformImage(item.file, item.format);
           const extension = formats.find((format) => format.value === item.format)!.extension;
-          const base = item.file.name.replace(/\.[^.]+$/, "").replace(/[\\/<>:"|?*\x00-\x1f]/g, "_").slice(0, 120).trim() || "converted";
+          const base = item.file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9 _().-]/g, "_").slice(0, 120).trim() || "converted";
           let name = `${base}.${extension}`;
           let suffix = 2;
           while (usedNames.has(name.toLowerCase())) name = `${base}-${suffix++}.${extension}`;
