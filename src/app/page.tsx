@@ -16,9 +16,322 @@ const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp", "image/bm
 const formatBytes = (bytes: number) => bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 const fileIsSupported = (file: File) => (allowedTypes.has(file.type) || /\.(bmp|avif)$/i.test(file.name)) && file.size > 0 && file.size <= MAX_BYTES;
 
+type HelpEntry = {
+  category: string;
+  question: string;
+  answer: string;
+};
+
+const helpEntries: HelpEntry[] = [
+  {
+    category: "Getting started",
+    question: "How do I add images?",
+    answer: "Use Select files, drag files onto the upload area, or paste a copied image with Ctrl+V or Cmd+V.",
+  },
+  {
+    category: "Getting started",
+    question: "Can I add several images at once?",
+    answer: "Yes. Select multiple images in the file picker or drop a group of files into the workspace.",
+  },
+  {
+    category: "Getting started",
+    question: "What is the maximum number of images?",
+    answer: "The workspace holds up to 20 images at a time.",
+  },
+  {
+    category: "Getting started",
+    question: "What is the maximum file size?",
+    answer: "Each input image must be 20 MB or smaller.",
+  },
+  {
+    category: "Getting started",
+    question: "Why is my image not accepted?",
+    answer: "The file may be empty, too large, mislabeled, or an unsupported image format.",
+  },
+  {
+    category: "Getting started",
+    question: "Can I paste an image from the clipboard?",
+    answer: "Yes, if your browser exposes the copied image as a clipboard file.",
+  },
+  {
+    category: "Getting started",
+    question: "Why did paste do nothing?",
+    answer: "Some browsers or applications copy text or HTML rather than an image file. Try saving and selecting the image.",
+  },
+  {
+    category: "Getting started",
+    question: "Can I add more images after selecting the first ones?",
+    answer: "Yes. Use Add files above the queue while no conversion is running.",
+  },
+  {
+    category: "Getting started",
+    question: "Can I remove one image?",
+    answer: "Yes. Use the remove control beside its row before or after conversion.",
+  },
+  {
+    category: "Getting started",
+    question: "How do I clear the queue?",
+    answer: "Use Clear all. This also releases generated download URLs.",
+  },
+  {
+    category: "Formats",
+    question: "Which output formats are available?",
+    answer: "You can export PNG, JPEG, or WebP images.",
+  },
+  {
+    category: "Formats",
+    question: "Which input formats are supported?",
+    answer: "PNG, JPEG, WebP, BMP, and AVIF inputs are accepted when your browser can decode them.",
+  },
+  {
+    category: "Formats",
+    question: "Why is AVIF support different across browsers?",
+    answer: "AVIF decoding depends on the browser version and its supported image codecs.",
+  },
+  {
+    category: "Formats",
+    question: "Can I convert BMP images?",
+    answer: "Yes, when your browser can decode the BMP file. The result can be PNG, JPEG, or WebP.",
+  },
+  {
+    category: "Formats",
+    question: "Can I export GIF files?",
+    answer: "No. GIF export is not part of this version.",
+  },
+  {
+    category: "Formats",
+    question: "Does the app convert SVG files?",
+    answer: "No. SVG is not accepted because this workspace is designed for raster image conversion.",
+  },
+  {
+    category: "Formats",
+    question: "What is PNG best for?",
+    answer: "PNG is useful for graphics, sharp edges, and images that need transparency.",
+  },
+  {
+    category: "Formats",
+    question: "What is JPEG best for?",
+    answer: "JPEG is commonly used for photos and does not preserve transparency.",
+  },
+  {
+    category: "Formats",
+    question: "What is WebP best for?",
+    answer: "WebP often provides compact images with support for transparency.",
+  },
+  {
+    category: "Formats",
+    question: "Can I choose a different format for each image?",
+    answer: "Yes. Each queue row has its own output format selector.",
+  },
+  {
+    category: "Formats",
+    question: "How do I set one format for new images?",
+    answer: "Use the Default output selector in the session panel.",
+  },
+  {
+    category: "Formats",
+    question: "Does changing the default update completed images?",
+    answer: "No. Completed images keep their existing result until you change that row's format.",
+  },
+  {
+    category: "Formats",
+    question: "Can I convert a PNG to PNG?",
+    answer: "Yes. The browser decodes and re-encodes the image, which can change the output size.",
+  },
+  {
+    category: "Formats",
+    question: "Does conversion preserve transparency?",
+    answer: "PNG and WebP can preserve transparency. JPEG uses a white background.",
+  },
+  {
+    category: "Formats",
+    question: "Will the output look exactly the same?",
+    answer: "Not always. Different formats and browser encoders may affect colors, compression, or metadata.",
+  },
+  {
+    category: "Processing",
+    question: "Where does conversion happen?",
+    answer: "Image decoding and encoding happen locally in your browser using the Canvas API.",
+  },
+  {
+    category: "Processing",
+    question: "Are my files uploaded to a server?",
+    answer: "The conversion code processes images in your browser rather than uploading them for conversion.",
+  },
+  {
+    category: "Processing",
+    question: "Is an account required?",
+    answer: "No. You can use the conversion workspace without creating an account.",
+  },
+  {
+    category: "Processing",
+    question: "Can I use the app offline?",
+    answer: "Once the page and required assets are available, conversion itself does not require a server request.",
+  },
+  {
+    category: "Processing",
+    question: "Why does conversion take time?",
+    answer: "Large images require decoding, canvas drawing, and encoding work on your device.",
+  },
+  {
+    category: "Processing",
+    question: "Can large images fail?",
+    answer: "Yes. Browser memory limits and supported canvas sizes vary by device.",
+  },
+  {
+    category: "Processing",
+    question: "What is the maximum image resolution?",
+    answer: "The converter enforces a 40-megapixel limit.",
+  },
+  {
+    category: "Processing",
+    question: "Can I process more than one image?",
+    answer: "Yes. Pending images are converted one after another.",
+  },
+  {
+    category: "Processing",
+    question: "Why does progress jump from 12% to 100%?",
+    answer: "The Canvas API does not expose precise encoding progress. The intermediate indicator is not a measured percentage.",
+  },
+  {
+    category: "Processing",
+    question: "Can I change a format while conversion runs?",
+    answer: "Format controls are temporarily disabled during processing to keep the queue consistent.",
+  },
+  {
+    category: "Processing",
+    question: "What happens if one conversion fails?",
+    answer: "The affected row displays an error and the converter continues with other queued images.",
+  },
+  {
+    category: "Processing",
+    question: "Can I retry a failed conversion?",
+    answer: "Yes. Use Convert remaining to retry failed or pending rows.",
+  },
+  {
+    category: "Processing",
+    question: "Will the browser retain my files after closing the page?",
+    answer: "No persistent image library is implemented. Reloading or closing the page clears the in-memory queue.",
+  },
+  {
+    category: "Downloads",
+    question: "How do I download a converted image?",
+    answer: "Use Download on its completed queue row.",
+  },
+  {
+    category: "Downloads",
+    question: "Can I download all images as a ZIP?",
+    answer: "ZIP export is not included in this version. Download completed images individually.",
+  },
+  {
+    category: "Downloads",
+    question: "Why is the downloaded file named differently?",
+    answer: "The app changes the extension to match the output and sanitizes unsupported filename characters.",
+  },
+  {
+    category: "Downloads",
+    question: "What happens when filenames repeat?",
+    answer: "The converter adds a numeric suffix to avoid duplicate output names in the same queue.",
+  },
+  {
+    category: "Downloads",
+    question: "Where are my downloaded files saved?",
+    answer: "Your browser determines the download location according to its settings.",
+  },
+  {
+    category: "Downloads",
+    question: "Can I share a converted file?",
+    answer: "Yes. Once downloaded, you can share the file using your device's normal sharing tools.",
+  },
+  {
+    category: "Privacy",
+    question: "Does the app keep a history of my images?",
+    answer: "No conversion history or persistent image storage is implemented in this version.",
+  },
+  {
+    category: "Privacy",
+    question: "Can other people see the images in my queue?",
+    answer: "The queue exists in your browser session. Avoid leaving sensitive images open on a shared device.",
+  },
+  {
+    category: "Privacy",
+    question: "Are generated download links permanent?",
+    answer: "No. Temporary object URLs are revoked when their files are removed or the page is unloaded.",
+  },
+  {
+    category: "Privacy",
+    question: "Can I convert private images?",
+    answer: "Conversion is local, but use a trusted device and browser for sensitive material.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Why did the browser say the format is unsupported?",
+    answer: "Your browser may not support decoding that input or encoding the requested output.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "What should I try after a conversion error?",
+    answer: "Try a smaller image, another supported format, or an up-to-date browser.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Why is my image blank after conversion?",
+    answer: "Some source images have unusual color profiles or decoding issues. Try opening the original in another image editor.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Why did my transparent image get a white background?",
+    answer: "JPEG cannot represent transparency, so the converter fills the background with white.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Why is the output larger than the original?",
+    answer: "Different encoders and image formats have different compression behavior.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Why did the same image get skipped?",
+    answer: "The queue filters duplicate files using their name, size, and last-modified timestamp.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Can I use a keyboard to navigate the controls?",
+    answer: "Yes. The workspace uses native buttons, inputs, links, and selectors with visible focus styles.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Is there a mobile layout?",
+    answer: "Yes. The two panels stack vertically on narrow screens.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Can I drag files from another application?",
+    answer: "Usually, if the application exposes them as actual files during drag and drop.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Does this app resize or crop images?",
+    answer: "No. Conversion retains the original decoded image dimensions.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Does this app rotate images?",
+    answer: "No explicit rotate tool is included. Browser image decoding may apply embedded orientation metadata.",
+  },
+  {
+    category: "Troubleshooting",
+    question: "Does it preserve EXIF metadata?",
+    answer: "Canvas re-encoding generally does not retain the original file's EXIF metadata.",
+  },
+];
+
 export default function HomePage() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [notice, setNotice] = useState("");
+  const [queueSearch, setQueueSearch] = useState("");
+  const [queueFilter, setQueueFilter] = useState<"all" | QueueStatus>("all");
+  const [showAllHelp, setShowAllHelp] = useState(false);
+  const [helpSearch, setHelpSearch] = useState("");
   const [dragging, setDragging] = useState(false);
   const [working, setWorking] = useState(false);
   const [defaultFormat, setDefaultFormat] = useState<OutputFormat>("image/webp");
@@ -143,6 +456,13 @@ export default function HomePage() {
   const errors = queue.filter((item) => item.status === "error").length;
   const conversionProgress = queue.length ? Math.round((finished / queue.length) * 100) : 0;
   const readyForDownload = queue.filter((item) => item.status === "done" && item.output);
+  const visibleQueue = queue.filter((item) => {
+    const matchesStatus = queueFilter === "all" || item.status === queueFilter;
+    const matchesSearch = item.file.name.toLocaleLowerCase().includes(queueSearch.trim().toLocaleLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+  const matchingHelp = helpEntries.filter((entry) => `${entry.question} ${entry.answer} ${entry.category}`.toLowerCase().includes(helpSearch.trim().toLowerCase()));
+  const visibleHelp = showAllHelp || helpSearch.trim() ? matchingHelp : matchingHelp.slice(0, 8);
 
   function applyFormatToPending(format: OutputFormat) {
     if (busyRef.current) return;
@@ -209,8 +529,9 @@ export default function HomePage() {
                     <button type="button" className="ghost-button" disabled={working} onClick={clearAll}>Clear all</button>
                   </div>
                 </div>
+                <div className="queue-tools"><label htmlFor="queue-search">Find file</label><input id="queue-search" type="search" placeholder="Search filenames…" value={queueSearch} onChange={(event) => setQueueSearch(event.target.value)} /><label htmlFor="queue-filter">Status</label><select id="queue-filter" value={queueFilter} onChange={(event) => setQueueFilter(event.target.value as typeof queueFilter)}><option value="all">All</option><option value="ready">Ready</option><option value="converting">Converting</option><option value="done">Completed</option><option value="error">Errors</option></select></div>
                 <div className="queue-table" role="list">
-                  {queue.map((item) => (
+                  {visibleQueue.map((item) => (
                     <div className="queue-row" role="listitem" key={item.id}>
                       <div className="file-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 15l3-3 2 2 2-2 2 3"/></svg></div>
                       <div className="file-main">
@@ -227,6 +548,7 @@ export default function HomePage() {
                       </div>
                     </div>
                   ))}
+                  {visibleQueue.length === 0 && <p className="queue-empty" role="status">No files match your search or status filter.</p>}
                 </div>
                 <div className="queue-footer">
                   <span>{finished} / {queue.length} converted</span>
@@ -261,6 +583,51 @@ export default function HomePage() {
         </div>
       </div>
       <section className="about" id="about"><div><span className="about-kicker">HOW IT WORKS</span><h2>Just your files.<br />Nothing else.</h2></div><p>Select images, choose PNG, JPG or WebP for each file, and download the results. Conversion runs in your browser using local image processing. BMP and AVIF input depends on your browser&apos;s decoding support.</p></section>
+      <section className="help-center" id="help-center" aria-labelledby="help-title">
+        <div className="help-header">
+          <div>
+            <span className="about-kicker">CONVERSION KNOW-HOW</span>
+            <h2 id="help-title">Your image toolkit, explained.</h2>
+            <p>Find answers about formats, privacy, downloads, and troubleshooting.</p>
+          </div>
+          <label className="help-search">
+            <span>Search help</span>
+            <input
+              type="search"
+              value={helpSearch}
+              onChange={(event) => setHelpSearch(event.target.value)}
+              placeholder="Search a topic…"
+            />
+          </label>
+        </div>
+        <div className="help-list">
+          {visibleHelp.map((entry) => (
+            <details className="help-entry" key={entry.question}>
+              <summary>
+                <span className="help-category">{entry.category}</span>
+                <span className="help-question">{entry.question}</span>
+                <span className="help-expand" aria-hidden="true">+</span>
+              </summary>
+              <p>{entry.answer}</p>
+            </details>
+          ))}
+          {visibleHelp.length === 0 && (
+            <p className="help-empty" role="status">
+              No matching help articles. Try a different search term.
+            </p>
+          )}
+        </div>
+        {!helpSearch.trim() && matchingHelp.length > 8 && (
+          <button
+            type="button"
+            className="help-more"
+            aria-expanded={showAllHelp}
+            onClick={() => setShowAllHelp((current) => !current)}
+          >
+            {showAllHelp ? "Show fewer answers" : `Browse all ${matchingHelp.length} answers`}
+          </button>
+        )}
+      </section>
       <footer><span>© {new Date().getFullYear()} ConvertTrio</span><span>Built for quick, private conversions.</span></footer>
     </main>
   );
