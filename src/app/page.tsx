@@ -11,13 +11,14 @@ const formats: { value: OutputFormat; label: string; extension: string }[] = [
   { value: "image/webp", label: "WebP", extension: "webp" },
 ];
 const MAX_BYTES = 20 * 1024 * 1024;
-const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
+const allowedTypes = new Set(["image/png", "image/jpeg", "image/webp", "image/bmp", "image/x-ms-bmp", "image/avif"]);
 const formatBytes = (bytes: number) => bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
 export default function HomePage() {
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [maxDimension, setMaxDimension] = useState(0);
+  const [cropAspect, setCropAspect] = useState<ImageOptions["cropAspect"]>("none");
   const [rotation, setRotation] = useState<ImageOptions["rotation"]>(0);
   const [flipHorizontal, setFlipHorizontal] = useState(false);
   const [flipVertical, setFlipVertical] = useState(false);
@@ -45,9 +46,9 @@ export default function HomePage() {
     if (busyRef.current) return;
     clearResults();
     const incoming = Array.from(selected);
-    const valid = incoming.filter((item) => allowedTypes.has(item.type) && item.size > 0 && item.size <= MAX_BYTES);
+    const valid = incoming.filter((item) => (allowedTypes.has(item.type) || /\\.(bmp|avif)$/i.test(item.name)) && item.size > 0 && item.size <= MAX_BYTES);
     setFiles(valid.slice(0, 20));
-    setError(incoming.length !== valid.length ? "Some files were skipped. Use PNG, JPG or WebP images under 20 MB." : incoming.length > 20 ? "Only the first 20 images were added." : "");
+    setError(incoming.length !== valid.length ? "Some files were skipped. Use PNG, JPG, WebP, BMP or AVIF images under 20 MB." : incoming.length > 20 ? "Only the first 20 images were added." : "");
   }
 
   async function convert() {
@@ -61,7 +62,15 @@ export default function HomePage() {
     try {
       for (let index = 0; index < files.length; index++) {
         const file = files[index];
-        const blob = await transformImage(file, { format, maxDimension, rotation, flipHorizontal, flipVertical });
+        let blob: Blob;
+        try {
+          blob = await transformImage(file, { format, maxDimension, cropAspect, rotation, flipHorizontal, flipVertical });
+        } catch (cause) {
+          if (cause instanceof Error && (cause.name === "EncodingError" || cause.name === "NotSupportedError")) {
+            throw new Error(`Your browser cannot open ${file.name}. Try another browser or image format.`);
+          }
+          throw cause;
+        }
         const extension = formats.find((item) => item.value === format)!.extension;
         const base = file.name.replace(/\\.[^.]+$/, "") || "converted";
         let name = `${base}.${extension}`;
@@ -100,17 +109,17 @@ export default function HomePage() {
       <section className="hero">
         <div className="eyebrow"><span className="eyebrow-dot" /> IMAGE CONVERTER</div>
         <h1>Convert your files.</h1>
-        <p className="subtitle">Convert PNG, JPG and WebP images directly in your browser.</p>
+        <p className="subtitle">Convert PNG, JPG, WebP, BMP and AVIF images directly in your browser.</p>
       </section>
 
       <section className="converter" id="converter" aria-label="Image converter">
         <div className="converter-heading">
           <div><p className="section-kicker">CONVERTER</p><h2>Upload images</h2><p className="panel-subtitle">Select images to convert.</p></div>
-          <span className="converter-tag">PNG · JPG · WEBP</span>
+          <span className="converter-tag">PNG · JPG · WEBP · BMP · AVIF</span>
         </div>
-        <input ref={inputRef} className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp" aria-label="Choose images" onChange={(event) => { if (event.target.files) chooseFiles(event.target.files); event.target.value = ""; }} />
+        <input ref={inputRef} className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/avif,.bmp,.avif" aria-label="Choose images" onChange={(event) => { if (event.target.files) chooseFiles(event.target.files); event.target.value = ""; }} />
         <div className={`dropzone ${dragging ? "dragging" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { event.preventDefault(); setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); chooseFiles(event.dataTransfer.files); }}>
-          <div className="empty-upload"><div className="upload-icon" aria-hidden="true">⇧</div><h3>Drag and drop images here</h3><p>or select files from your computer</p><button type="button" disabled={working} className="browse-button" onClick={() => inputRef.current?.click()}>Choose files <span aria-hidden="true">↗</span></button><small>PNG, JPG or WebP · Up to 20 files · 20 MB each</small></div>
+          <div className="empty-upload"><div className="upload-icon" aria-hidden="true">⇧</div><h3>Drag and drop images here</h3><p>or select files from your computer</p><button type="button" disabled={working} className="browse-button" onClick={() => inputRef.current?.click()}>Choose files <span aria-hidden="true">↗</span></button><small>PNG, JPG, WebP, BMP or AVIF · Up to 20 files · 20 MB each</small></div>
         </div>
         {files.length > 0 && <div className="batch-list"><div className="batch-heading"><strong>{files.length} image{files.length !== 1 ? "s" : ""} selected</strong><button className="text-button" disabled={working} onClick={() => { setFiles([]); clearResults(); }} type="button">Clear all</button></div>{files.map((file, index) => <div className="batch-item" key={index}><span className="batch-filename" title={file.name}>{file.name}</span><span>{formatBytes(file.size)}</span></div>)}</div>}
         <div className="converter-controls">
@@ -128,6 +137,14 @@ export default function HomePage() {
             <option value={1920}>1920 px (Full HD)</option>
             <option value={1280}>1280 px</option>
             <option value={800}>800 px</option>
+          </select>
+          <label htmlFor="image-crop">Center crop</label>
+          <select id="image-crop" value={cropAspect} disabled={working} onChange={(event) => { setCropAspect(event.target.value as ImageOptions["cropAspect"]); clearResults(); }}>
+            <option value="none">No crop</option>
+            <option value="1:1">Square (1:1)</option>
+            <option value="4:3">Landscape (4:3)</option>
+            <option value="16:9">Widescreen (16:9)</option>
+            <option value="9:16">Portrait (9:16)</option>
           </select>
           <label htmlFor="image-rotation">Rotate</label>
           <select id="image-rotation" value={rotation} disabled={working} onChange={(event) => { setRotation(Number(event.target.value) as ImageOptions["rotation"]); clearResults(); }}>
