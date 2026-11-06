@@ -124,6 +124,9 @@ export default function HomePage() {
 
   const finished = queue.filter((item) => item.status === "done").length;
   const pending = queue.filter((item) => item.status === "ready" || item.status === "error").length;
+  const totalBytes = queue.reduce((sum, item) => sum + item.file.size, 0);
+  const errors = queue.filter((item) => item.status === "error").length;
+  const conversionProgress = queue.length ? Math.round((finished / queue.length) * 100) : 0;
 
   return (
     <main className="shell">
@@ -132,43 +135,89 @@ export default function HomePage() {
         <div className="header-right"><span className="header-status"><span className="online-dot" /> Browser-based conversion</span><a href="#about" className="header-link">How it works</a></div>
       </header>
       <div className="workspace" id="converter">
-        <div className="intro"><div className="intro-label">IMAGE CONVERTER <span> / 01</span></div><h1>Convert images.<br /><span>Keep it simple.</span></h1><p>Fast, private image conversion. No sign-up. No upload to a server.</p></div>
+        <div className="workspace-heading">
+          <div className="intro-label">WORKSPACE <span>/ IMAGE CONVERSION</span></div>
+          <span className="workspace-version">PRIVATE BY DESIGN · V1</span>
+        </div>
         <input ref={inputRef} className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/avif,.bmp,.avif" aria-label="Select images" onChange={(event) => { if (event.target.files) addFiles(event.target.files); event.target.value = ""; }} />
-        {queue.length === 0 ? (
-          <section className={`dropzone ${dragging ? "dragging" : ""}`} aria-label="Upload images"
-            onDragEnter={(event) => { event.preventDefault(); dragDepthRef.current++; setDragging(true); }}
-            onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; }}
-            onDragLeave={(event) => { event.preventDefault(); dragDepthRef.current = Math.max(0, dragDepthRef.current - 1); if (dragDepthRef.current === 0) setDragging(false); }}
-            onDrop={(event) => { event.preventDefault(); dragDepthRef.current = 0; setDragging(false); addFiles(event.dataTransfer.files); }}>
-            <div className="drop-icon" aria-hidden="true"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 16V3m0 0-5 5m5-5 5 5M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg></div>
-            <h2>Drop files here</h2>
-            <p>Drag and drop images, or select them from your device.</p>
-            <button type="button" className="primary-button select-button" onClick={() => inputRef.current?.click()}>Select files <span aria-hidden="true">↗</span></button>
-            <div className="drop-hint">or paste an image with <kbd>Ctrl</kbd> + <kbd>V</kbd> / <kbd>⌘</kbd> + <kbd>V</kbd></div>
-          </section>
-        ) : (
-          <section className="queue-panel" aria-label="Conversion queue">
-            <div className="queue-header"><div><h2>Your files <span>{queue.length}</span></h2><p>Choose an output format for each image.</p></div><div className="queue-header-actions"><button type="button" className="secondary-button" disabled={working || queue.length >= 20} onClick={() => inputRef.current?.click()}>+ Add files</button><button type="button" className="ghost-button" disabled={working} onClick={clearAll}>Clear all</button></div></div>
-            <div className="queue-table" role="list">
-              {queue.map((item) => (
-                <div className="queue-row" role="listitem" key={item.id}>
-                  <div className="file-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 15l3-3 2 2 2-2 2 3"/></svg></div>
-                  <div className="file-main"><strong title={item.file.name}>{item.file.name}</strong><span>{formatBytes(item.file.size)} <span className="file-divider">·</span> {item.status === "done" ? "Converted" : item.status === "converting" ? "Processing…" : item.status === "error" ? "Failed" : "Ready"}</span>
-                    {item.status === "converting" && <div className="row-progress" role="progressbar" aria-label={`Converting ${item.file.name}`} aria-valuenow={item.progress} aria-valuemin={0} aria-valuemax={100}><div style={{ width: `${item.progress}%` }} /></div>}
-                    {item.status === "error" && <small className="row-error" role="status">{item.error}</small>}
-                  </div>
-                  <div className="row-actions"><label className="format-label" htmlFor={`format-${item.id}`}>TO</label><select id={`format-${item.id}`} value={item.format} disabled={working} onChange={(event) => changeFormat(item.id, event.target.value as OutputFormat)}>{formats.map((format) => <option key={format.value} value={format.value}>{format.label}</option>)}</select>
-                    {item.status === "done" && item.output ? <a className="download-button" href={item.output.url} download={item.output.name}><span aria-hidden="true">↓</span> Download</a> : <span className={`row-state ${item.status === "error" ? "state-error" : ""}`}>{item.status === "converting" ? `${item.progress}%` : item.status === "error" ? "Error" : "Waiting"}</span>}
-                    <button type="button" className="remove-button" aria-label={`Remove ${item.file.name}`} title="Remove" disabled={working} onClick={() => removeFile(item.id)}>×</button>
+        <div className="studio-layout">
+          <section className="studio-main" aria-label="Image workspace">
+            <div className="studio-title">
+              <span className="section-overline">01 / SOURCE</span>
+              <h1>Drop it.<br /><span>Convert it.</span></h1>
+              <p>One workspace. Every format you need.</p>
+            </div>
+            {queue.length === 0 ? (
+              <div className={`dropzone ${dragging ? "dragging" : ""}`} aria-label="Upload images"
+                onDragEnter={(event) => { event.preventDefault(); dragDepthRef.current++; setDragging(true); }}
+                onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = "copy"; }}
+                onDragLeave={(event) => { event.preventDefault(); dragDepthRef.current = Math.max(0, dragDepthRef.current - 1); if (dragDepthRef.current === 0) setDragging(false); }}
+                onDrop={(event) => { event.preventDefault(); dragDepthRef.current = 0; setDragging(false); addFiles(event.dataTransfer.files); }}>
+                <div className="drop-illustration" aria-hidden="true">
+                  <div className="illustration-sheet illustration-sheet-back" />
+                  <div className="illustration-sheet illustration-sheet-front"><span>PNG</span><span>↗</span></div>
+                </div>
+                <h2>Drop your files anywhere.</h2>
+                <p>Or choose images from your device to begin.</p>
+                <button type="button" className="primary-button select-button" onClick={() => inputRef.current?.click()}>Select files <span aria-hidden="true">↗</span></button>
+                <div className="drop-hint">TIP: PASTE IMAGES WITH <kbd>CTRL</kbd> + <kbd>V</kbd></div>
+              </div>
+            ) : (
+              <div className="queue-panel" aria-label="Conversion queue">
+                <div className="queue-header">
+                  <div><span className="section-overline">YOUR QUEUE</span><h2>{queue.length} image{queue.length !== 1 ? "s" : ""} ready</h2></div>
+                  <div className="queue-header-actions">
+                    <button type="button" className="secondary-button" disabled={working || queue.length >= 20} onClick={() => inputRef.current?.click()}>+ Add files</button>
+                    <button type="button" className="ghost-button" disabled={working} onClick={clearAll}>Clear all</button>
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="queue-footer"><span>{finished} of {queue.length} converted</span><button type="button" className="primary-button" disabled={working || pending === 0} onClick={convert}>{working ? "Converting…" : pending > 0 && finished > 0 ? "Convert remaining" : "Convert files"} <span aria-hidden="true">→</span></button></div>
+                <div className="queue-table" role="list">
+                  {queue.map((item) => (
+                    <div className="queue-row" role="listitem" key={item.id}>
+                      <div className="file-icon" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 15l3-3 2 2 2-2 2 3"/></svg></div>
+                      <div className="file-main">
+                        <strong title={item.file.name}>{item.file.name}</strong>
+                        <span>{formatBytes(item.file.size)} <span className="file-divider">·</span> {item.status === "done" ? "Converted" : item.status === "converting" ? "Processing…" : item.status === "error" ? "Failed" : "Ready"}</span>
+                        {item.status === "converting" && <div className="row-progress" role="progressbar" aria-label={`Converting ${item.file.name}`} aria-valuenow={item.progress} aria-valuemin={0} aria-valuemax={100}><div style={{ width: `${item.progress}%` }} /></div>}
+                        {item.status === "error" && <small className="row-error" role="status">{item.error}</small>}
+                      </div>
+                      <div className="row-actions">
+                        <label className="format-label" htmlFor={`format-${item.id}`}>TO</label>
+                        <select id={`format-${item.id}`} value={item.format} disabled={working} onChange={(event) => changeFormat(item.id, event.target.value as OutputFormat)}>{formats.map((format) => <option key={format.value} value={format.value}>{format.label}</option>)}</select>
+                        {item.status === "done" && item.output ? <a className="download-button" href={item.output.url} download={item.output.name}><span aria-hidden="true">↓</span> Download</a> : <span className={`row-state ${item.status === "error" ? "state-error" : ""}`}>{item.status === "converting" ? `${item.progress}%` : item.status === "error" ? "Error" : "Waiting"}</span>}
+                        <button type="button" className="remove-button" aria-label={`Remove ${item.file.name}`} title="Remove" disabled={working} onClick={() => removeFile(item.id)}>×</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="queue-footer">
+                  <span>{finished} / {queue.length} converted</span>
+                  <button type="button" className="primary-button" disabled={working || pending === 0} onClick={convert}>{working ? "Converting…" : pending > 0 && finished > 0 ? "Convert remaining" : "Convert files"} <span aria-hidden="true">→</span></button>
+                </div>
+              </div>
+            )}
+            {notice && <div className="inline-notice" role="alert"><span aria-hidden="true">!</span>{notice}<button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">×</button></div>}
+            <div className="workspace-foot"><span>PNG · JPG · WEBP · BMP · AVIF</span><span>20 FILES / 20 MB EACH</span></div>
           </section>
-        )}
-        {notice && <div className="inline-notice" role="alert"><span aria-hidden="true">!</span>{notice}<button type="button" onClick={() => setNotice("")} aria-label="Dismiss notification">×</button></div>}
-        <div className="workspace-foot"><span>PNG · JPG · WEBP · BMP · AVIF</span><span>20 files max · 20 MB each</span><span>Files stay on your device</span></div>
+          <aside className="studio-sidebar" aria-label="Workspace information">
+            <div className="sidebar-top">
+              <span className="section-overline">02 / SESSION</span>
+              <h2>Everything<br />in one place.</h2>
+              <p>Your files stay right here, in your browser. No accounts, no uploads, no detours.</p>
+            </div>
+            <div className="session-metrics" aria-live="polite">
+              <div className="metric"><span>FILES IN QUEUE</span><strong>{String(queue.length).padStart(2, "0")}</strong></div>
+              <div className="metric"><span>ORIGINAL SIZE</span><strong>{queue.length ? formatBytes(totalBytes) : "—"}</strong></div>
+              <div className="metric"><span>COMPLETED</span><strong>{String(finished).padStart(2, "0")}</strong></div>
+              {errors > 0 && <div className="metric metric-error"><span>NEEDS ATTENTION</span><strong>{String(errors).padStart(2, "0")}</strong></div>}
+            </div>
+            <div className="sidebar-progress">
+              <div className="sidebar-progress-label"><span>SESSION PROGRESS</span><strong>{conversionProgress}%</strong></div>
+              <div className="sidebar-progress-track" role="progressbar" aria-label="Completed files" aria-valuenow={conversionProgress} aria-valuemin={0} aria-valuemax={100}><div style={{ width: `${conversionProgress}%` }} /></div>
+            </div>
+            <div className="sidebar-note"><span className="online-dot" /> LOCAL PROCESSING <p>Nothing leaves this device. All conversion happens in your browser.</p></div>
+          </aside>
+        </div>
       </div>
       <section className="about" id="about"><div><span className="about-kicker">HOW IT WORKS</span><h2>Just your files.<br />Nothing else.</h2></div><p>Select images, choose PNG, JPG or WebP for each file, and download the results. Conversion runs in your browser using local image processing. BMP and AVIF input depends on your browser&apos;s decoding support.</p></section>
       <footer><span>© {new Date().getFullYear()} ConvertTrio</span><span>Built for quick, private conversions.</span></footer>
