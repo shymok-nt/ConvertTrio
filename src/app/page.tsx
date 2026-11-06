@@ -115,15 +115,16 @@ export default function HomePage() {
       </header>
 
       <section className="hero">
-        <p className="eyebrow"><span className="status-dot" /> FREE ONLINE IMAGE CONVERTER</p>
-        <h1>Images, in the<br /><span>right format.</span></h1>
-        <p className="subtitle">A simple way to convert your images. No accounts, no uploads, no unnecessary steps.</p>
+        <p className="eyebrow"><span className="status-dot" /> CONVERTTRIO / IMAGE UTILITIES</p>
+        <h1>Every image,<br /><em>in its element.</em></h1>
+        <p className="subtitle">A considered space for everyday image conversion. Choose a format, convert locally, and move on.</p>
+        <div className="hero-index" aria-hidden="true"><span>FORMAT STUDIES</span><span>VOL. 01 — 2026</span></div>
       </section>
 
       <section className="converter" id="converter" aria-label="Image converter">
         <div className="converter-heading">
-          <div><h2>Convert images</h2><p>Drop your files below to get started.</p></div>
-          <span className="converter-tag">01 / CONVERT</span>
+          <div><h2>The converter.</h2><p>All the essentials. Nothing extra.</p></div>
+          <span className="converter-tag">THE WORKSPACE / 01</span>
         </div>
         <input ref={inputRef} className="sr-only" type="file" multiple accept="image/png,image/jpeg,image/webp,image/bmp,image/avif,.bmp,.avif" aria-label="Choose images" onChange={(event) => { if (event.target.files) chooseFiles(event.target.files); event.target.value = ""; }} />
         <div className={`dropzone ${dragging ? "dragging" : ""}`} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { event.preventDefault(); setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); chooseFiles(event.dataTransfer.files); }}>
@@ -148,10 +149,11 @@ export default function HomePage() {
         <div className="privacy-note"><span aria-hidden="true">◌</span> Your files never leave your device. Everything runs locally in your browser.</div>
       </section>
 
-      <section className="benefits" id="how-it-works">
-        <div><span className="benefit-number">01</span><h3>Choose your files</h3><p>Select one or multiple images from your device.</p></div>
-        <div><span className="benefit-number">02</span><h3>Pick a format</h3><p>Convert to PNG, JPG, or WebP with a single click.</p></div>
-        <div><span className="benefit-number">03</span><h3>Download</h3><p>Save each converted image instantly, with no account needed.</p></div>
+      <section className="process-intro" id="how-it-works"><span className="process-kicker">A SMALL GUIDE / 02</span><h2>Three steps.<br /><em>Nothing more.</em></h2><p>Built for the task, not the ceremony. Your images stay in your browser throughout.</p></section>
+      <section className="benefits" aria-label="How conversion works">
+        <div><span className="benefit-number">01 — SELECT</span><h3>Choose your files</h3><p>Select one or multiple images from your device.</p></div>
+        <div><span className="benefit-number">02 — CONVERT</span><h3>Pick a format</h3><p>Convert to PNG, JPG, or WebP with a single click.</p></div>
+        <div><span className="benefit-number">03 — SAVE</span><h3>Download</h3><p>Save each converted image instantly, with no account needed.</p></div>
       </section>
       <footer><span>© {new Date().getFullYear()} ConvertTrio</span><span>Made for the little things that should be easy.</span></footer>
     </main>
