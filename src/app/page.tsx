@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createZip } from "@/lib/zip";
 
 type OutputFormat = "image/png" | "image/jpeg" | "image/webp";
 type Result = { url: string; name: string; size: number; blob: Blob };
@@ -104,22 +103,6 @@ export default function HomePage() {
     }
   }
 
-  async function downloadZip() {
-    if (!results.length) return;
-    try {
-      const zip = await createZip(results.map(({ name, blob }) => ({ name, blob })));
-      const url = URL.createObjectURL(zip);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "converttrio-images.zip";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 60000);
-    } catch {
-      setError("Could not create ZIP archive. Download the images individually.");
-    }
-  }
 
   return (
     <main className="shell">
@@ -159,7 +142,7 @@ export default function HomePage() {
         </div>
         {working && <div className="progress-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Conversion progress"><div style={{ width: `${progress}%` }} /></div>}
         {error && <p className="message error" role="alert">{error}</p>}
-        {results.length > 0 && <div className="message success" role="status"><div><strong>{results.length} image{results.length !== 1 ? "s" : ""} ready!</strong><span>Converted successfully</span></div>{results.length > 1 && <button className="download-button" type="button" onClick={downloadZip}>Download ZIP ↓</button>}</div>}
+        {results.length > 0 && <div className="message success" role="status"><div><strong>{results.length} image{results.length !== 1 ? "s" : ""} ready!</strong><span>Converted successfully</span></div></div>}
         {results.length > 0 && <div className="batch-list">{results.map((item) => <div className="batch-item" key={item.name}><span className="batch-filename">{item.name}</span><span>{formatBytes(item.size)}</span><a className="text-button" href={item.url} download={item.name}>Download ↓</a></div>)}</div>}
         <p className="privacy-note">🔒 Your images stay on your device. Conversion happens in your browser.</p>
       </section>
